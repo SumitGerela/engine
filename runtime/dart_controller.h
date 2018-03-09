@@ -30,7 +30,8 @@ class DartController {
       size_t size,
       const std::string& entrypoint = main_entrypoint_);
   tonic::DartErrorHandleType RunFromSource(const std::string& main,
-                                           const std::string& packages);
+                                           const std::string& packages,
+                                           const std::string& entrypoint = main_entrypoint_);
 
   void CreateIsolateFor(const std::string& script_uri,
                         const uint8_t* isolate_snapshot_data,

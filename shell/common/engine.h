@@ -51,6 +51,7 @@ class Engine : public blink::RuntimeDelegate {
   void RunBundleAndSource(const std::string& bundle_path,
                           const std::string& main,
                           const std::string& packages,
+                          const std::string& entrypoint = main_entrypoint_,
                           bool reuse_runtime_controller = false);
 
   void BeginFrame(fxl::TimePoint frame_time);

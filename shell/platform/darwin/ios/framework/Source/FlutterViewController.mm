@@ -58,6 +58,8 @@ class PlatformMessageResponseDarwin : public blink::PlatformMessageResponse {
 }  // namespace
 
 @interface FlutterViewController ()<UIAlertViewDelegate, FlutterTextInputDelegate>
+@property (nonatomic, strong) NSString *entrypoint;
+@property (nonatomic, strong) FlutterDartProject *initialDartProject;
 @end
 
 @implementation FlutterViewController {
@@ -92,27 +94,34 @@ class PlatformMessageResponseDarwin : public blink::PlatformMessageResponse {
 
 - (instancetype)initWithProject:(FlutterDartProject*)project
                         nibName:(NSString*)nibNameOrNil
-                         bundle:(NSBundle*)nibBundleOrNil {
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-
-  if (self) {
-    if (project == nil)
-      _dartProject.reset([[FlutterDartProject alloc] initFromDefaultSourceForConfiguration]);
-    else
-      _dartProject.reset([project retain]);
-
-    [self performCommonViewControllerInitialization];
-  }
-
-  return self;
+                         bundle:(NSBundle*)nibBundleOrNil
+                     entryPoint:(NSString*)entryPoint {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if(self)
+        self.initialDartProject = project;
+            
+    return self;
 }
 
 - (instancetype)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil {
-  return [self initWithProject:nil nibName:nil bundle:nil];
+  return [self initWithProject:nil nibName:nil bundle:nil entryPoint:nil];
 }
 
 - (instancetype)initWithCoder:(NSCoder*)aDecoder {
-  return [self initWithProject:nil nibName:nil bundle:nil];
+  return [self initWithProject:nil nibName:nil bundle:nil entryPoint:nil];;
+}
+
+#pragma mark - Dart project setup
+
+- (void)setupDartProject {
+    if(self.entrypoint == nil)
+        self.entrypoint = @"main";
+    
+    if (self.initialDartProject == nil)
+        _dartProject.reset([[FlutterDartProject alloc] initFromDefaultSourceForConfiguration]);
+    else
+        _dartProject.reset([self.initialDartProject retain]);
+    [self performCommonViewControllerInitialization];
 }
 
 #pragma mark - Common view controller initialization tasks
@@ -278,6 +287,7 @@ class PlatformMessageResponseDarwin : public blink::PlatformMessageResponse {
   const enum VMType type = Dart_IsPrecompiledRuntime() ? VMTypePrecompilation : VMTypeInterpreter;
 
   [_dartProject launchInEngine:&_platformView->engine()
+                withEntrypoint:self.entrypoint
                 embedderVMType:type
                         result:^(BOOL success, NSString* message) {
                           if (!success) {
@@ -333,6 +343,12 @@ class PlatformMessageResponseDarwin : public blink::PlatformMessageResponse {
 }
 
 #pragma mark - UIViewController lifecycle notifications
+- (void)viewDidLoad {
+    TRACE_EVENT0("flutter", "viewDidLoad");
+    
+    [self setupDartProject];
+    [super viewDidLoad];
+}
 
 - (void)viewWillAppear:(BOOL)animated {
   TRACE_EVENT0("flutter", "viewWillAppear");

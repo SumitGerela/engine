@@ -185,7 +185,8 @@ tonic::DartErrorHandleType DartController::RunFromScriptSnapshot(
 
 tonic::DartErrorHandleType DartController::RunFromSource(
     const std::string& main,
-    const std::string& packages) {
+    const std::string& packages,
+    const std::string& entrypoint) {
   tonic::DartState::Scope scope(dart_state());
   tonic::DartErrorHandleType error = tonic::kNoError;
   if (Dart_IsNull(Dart_RootLibrary())) {
@@ -196,7 +197,7 @@ tonic::DartErrorHandleType DartController::RunFromSource(
     LogIfError(result);
     error = tonic::GetErrorHandleType(result);
   }
-  if (SendStartMessage(Dart_RootLibrary())) {
+  if (SendStartMessage(Dart_RootLibrary(), entrypoint)) {
     return tonic::kCompilationErrorType;
   }
   return error;

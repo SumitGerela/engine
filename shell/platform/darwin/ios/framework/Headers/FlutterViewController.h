@@ -18,7 +18,8 @@ FLUTTER_EXPORT
 
 - (instancetype)initWithProject:(FlutterDartProject*)project
                         nibName:(NSString*)nibNameOrNil
-                         bundle:(NSBundle*)nibBundleOrNil NS_DESIGNATED_INITIALIZER;
+                         bundle:(NSBundle*)nibBundleOrNil
+                     entryPoint:(NSString*)entryPoint NS_DESIGNATED_INITIALIZER;
 
 - (void)handleStatusBarTouches:(UIEvent*)event;
 

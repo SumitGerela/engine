@@ -324,9 +324,11 @@ static NSString* NSStringFromVMType(VMType type) {
       std::string main = _dartSource.dartMain.absoluteURL.path.UTF8String;
       std::string packages = _dartSource.packages.absoluteURL.path.UTF8String;
       blink::Threads::UI()->PostTask(
-          [ engine = engine->GetWeakPtr(), bundle_path, main, packages ] {
+          [ engine = engine->GetWeakPtr(), bundle_path, main, packages,
+           entrypoint = std::string([entrypoint UTF8String])
+           ] {
             if (engine)
-              engine->RunBundleAndSource(bundle_path, main, packages);
+              engine->RunBundleAndSource(bundle_path, main, packages, entrypoint);
           });
     }
 

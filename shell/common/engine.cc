@@ -340,6 +340,7 @@ void Engine::RunBundleWithAssets(
 void Engine::RunBundleAndSource(const std::string& bundle_path,
                                 const std::string& main,
                                 const std::string& packages,
+                                const std::string& entrypoint,
                                 bool reuse_runtime_controller) {
   TRACE_EVENT0("flutter", "Engine::RunBundleAndSource");
   FXL_CHECK(!blink::IsRunningPrecompiledCode())
@@ -358,10 +359,10 @@ void Engine::RunBundleAndSource(const std::string& bundle_path,
     if (!files::ReadFileToVector(main, &kernel)) {
       load_script_error_ = tonic::kUnknownErrorType;
     }
-    load_script_error_ = runtime_->dart_controller()->RunFromKernel(kernel);
+    load_script_error_ = runtime_->dart_controller()->RunFromKernel(kernel, entrypoint);
   } else {
     load_script_error_ =
-        runtime_->dart_controller()->RunFromSource(main, packages_path);
+        runtime_->dart_controller()->RunFromSource(main, packages_path, entrypoint);
   }
 }
 
